@@ -79,8 +79,8 @@ class DVrouter(Router):
 		for add in self.neighbors:
 			if self.routingTable[add]['ID'] == port:
 				address = add
-		self.routingTable[add]['cost'] = INFINITY
-		self.neighbors.remove(add)
+		self.routingTable[address]['cost'] = INFINITY
+		self.neighbors.remove(address)
 
 
 	def handleTime(self, timeMillisecs):
