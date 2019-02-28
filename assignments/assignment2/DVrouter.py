@@ -79,7 +79,9 @@ class DVrouter(Router):
 		for add in self.neighbors:
 			if self.routingTable[add]['ID'] == port:
 				address = add
-		self.routingTable[address]['cost'] = INFINITY
+		for router in self.routingTable:
+			if self.routingTable[router]['port'] == port:
+				self.routingTable[router]['cost'] = INFINITY
 		self.neighbors.remove(address)
 
 
