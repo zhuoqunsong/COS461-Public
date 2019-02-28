@@ -47,13 +47,13 @@ class DVrouter(Router):
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
 					if cost < self.routingTable[router]['cost']:
-						self.routingTable[router] = {'port': port, 'cost': cost, 'next_hop': self.routingTable[router]['next_hop']}
+						self.routingTable[router] = {'port': port, 'cost': cost, 'ID': self.routingTable[router]['ID']}
 				else: # Add to our routing table
 					# DO ADDRESS STUFF TOO
 					dist = self.routingTable[src]['cost']
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
-					self.routingTable[router] = {'port': port, 'cost': cost, 'next_hop': self.routingTable[router]['next_hop']}
+					self.routingTable[router] = {'port': port, 'cost': cost, 'ID': self.routingTable[src]['ID']}
 		else: # packet.isTraceroute(): send packet to destination
 			dst = packet.dstAddr
 			if dst in self.routingTable:
@@ -63,7 +63,7 @@ class DVrouter(Router):
 
 	def handleNewLink(self, port, endpoint, cost):
 		"""TODO: handle new link"""
-		self.routingTable[endpoint] = {'port': port, 'cost': cost, 'next_hop': endpoint} # add link to routing table
+		self.routingTable[endpoint] = {'port': port, 'cost': cost, 'ID': port} # add link to routing table
 		self.neighbors.add(endpoint) # add new endpoint to neighbors
 		for router in self.neighbors: # send new routing table to all neighbors
 			if router == self.addr: continue
