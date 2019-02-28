@@ -63,7 +63,7 @@ class DVrouter(Router):
 
 	def handleNewLink(self, port, endpoint, cost):
 		"""TODO: handle new link"""
-		self.routingTable[endpoint] = {'port': port, 'cost': cost} # add link to routing table
+		self.routingTable[endpoint] = {'port': port, 'cost': cost, 'next_hop': endpoint} # add link to routing table
 		self.neighbors.add(endpoint) # add new endpoint to neighbors
 		for router in self.neighbors: # send new routing table to all neighbors
 			if router == self.addr: continue
