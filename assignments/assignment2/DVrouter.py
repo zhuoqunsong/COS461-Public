@@ -26,6 +26,7 @@ class DVrouter(Router):
 		"""TODO: add your own class fields and initialization code here"""
 		Router.__init__(self, addr)  # initialize superclass - don't remove
 		self.heartbeatTime = heartbeatTime # heartbeat time
+		self.sentTime = 0 # time last sent
 		self.currentTime = 0 # current time
 		self.routingTable = dict() # routing table
 		self.neighbors = set() # set of neighbors
@@ -80,12 +81,19 @@ class DVrouter(Router):
 	def handleTime(self, timeMillisecs):
 		"""TODO: handle current time"""
 		self.currentTime = timeMillisecs # handle current time
-		if self.currentTime % 20 == 0: # periodically send routing table to all neighbors
+		if self.sentTime == 0: # periodically send routing table to all neighbors
 			for router in self.neighbors:
 				if router == self.addr: continue
 				porta = self.routingTable[router]['port']
 				packets = Packet(Packet.ROUTING, self.addr, router, _table_string(self.routingTable))
 				self.send(porta, packets)
+		if self.currentTime - self.sentTime > self.heartbeatTime:
+			for router in self.neighbors:
+				if router == self.addr: continue
+				porta = self.routingTable[router]['port']
+				packets = Packet(Packet.ROUTING, self.addr, router, _table_string(self.routingTable))
+				self.send(porta, packets)
+			self.sentTime = self.currentTime
 
 
 	def debugString(self):
