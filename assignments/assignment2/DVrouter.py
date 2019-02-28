@@ -47,13 +47,13 @@ class DVrouter(Router):
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
 					if cost < self.routingTable[router]['cost']:
-						self.routingTable[router] = {'port': port, 'cost': cost}
+						self.routingTable[router] = {'port': port, 'cost': cost, 'next_hop': self.routingTable[router]['next_hop']}
 				else: # Add to our routing table
 					# DO ADDRESS STUFF TOO
 					dist = self.routingTable[src]['cost']
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
-					self.routingTable[router] = {'port': port, 'cost': cost}
+					self.routingTable[router] = {'port': port, 'cost': cost, 'next_hop': self.routingTable[router]['next_hop']}
 		else: # packet.isTraceroute(): send packet to destination
 			dst = packet.dstAddr
 			if dst in self.routingTable:
