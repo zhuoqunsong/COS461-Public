@@ -31,6 +31,7 @@ class DVrouter(Router):
 		self.sentTime = 0 # time last sent
 		self.currentTime = 0 # current time
 		self.routingTable = dict() # routing table
+		self.routingTable[self.addr] = {'port': None, 'cost': 0}
 		self.neighbors = set() # set of neighbors
 		# self.packeta = [] # content of packets received (for debugging purposes)
 
@@ -48,14 +49,17 @@ class DVrouter(Router):
 					dist = self.routingTable[src]['cost']
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
+					if cost > self.routingTable[router]['cost'] and self.routingTable[router]['port'] == port:
+						self.routingTable[router]['cost'] = INFINITY
 					if cost < self.routingTable[router]['cost']:
-						self.routingTable[router] = {'port': port, 'cost': cost, 'ID': self.routingTable[router]['ID']}
+						self.routingTable[router]['port'] = port
+						self.routingTable[router]['cost'] = cost
 				else: # Add to our routing table
 					# DO ADDRESS STUFF TOO
 					dist = self.routingTable[src]['cost']
 					cost = int(entry.split('%')[1].split('&')[0]) + dist
 					port = self.routingTable[src]['port']
-					self.routingTable[router] = {'port': port, 'cost': cost, 'ID': self.routingTable[src]['ID']}
+					self.routingTable[router] = {'port': port, 'cost': cost}
 		else: # packet.isTraceroute(): send packet to destination
 			dst = packet.dstAddr
 			if dst in self.routingTable:
