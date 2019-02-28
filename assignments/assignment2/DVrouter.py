@@ -70,19 +70,19 @@ class DVrouter(Router):
 	def handleNewLink(self, port, endpoint, cost):
 		"""TODO: handle new link"""
 		self.routingTable[endpoint] = {'port': port, 'cost': cost, 'ID': port} # add link to routing table
-		self.neighbors.add(endpoint) # add new endpoint to neighbors
+		self.neighbors.append((endpoint,cost,port)) # add new endpoint to neighbors
 		for router in self.neighbors: # send new routing table to all neighbors
-			if router == self.addr: continue
-			porta = self.routingTable[router]['port']
-			packets = Packet(Packet.ROUTING, self.addr, router, _table_string(self.routingTable))
+			if router[0] == self.addr: continue
+			porta = self.routingTable[router[0]]['port']
+			packets = Packet(Packet.ROUTING, self.addr, router[0], _table_string(self.routingTable))
 			self.send(porta, packets)
 
 	def handleRemoveLink(self, port):
 		"""TODO: handle removed link"""
 		address = None # address corresponds to address of removed port
 		for add in self.neighbors:
-			if self.routingTable[add]['ID'] == port:
-				address = add
+			if self.routingTable[add[0]]['ID'] == port:
+				address = add[0]
 		for router in self.routingTable:
 			if self.routingTable[router]['port'] == port:
 				self.routingTable[router]['cost'] = INFINITY
@@ -94,15 +94,15 @@ class DVrouter(Router):
 		self.currentTime = timeMillisecs # handle current time
 		if self.sentTime == 0: # periodically send routing table to all neighbors
 			for router in self.neighbors:
-				if router == self.addr: continue
-				porta = self.routingTable[router]['port']
-				packets = Packet(Packet.ROUTING, self.addr, router, _table_string(self.routingTable))
+				if router[0] == self.addr: continue
+				porta = self.routingTable[router[0]]['port']
+				packets = Packet(Packet.ROUTING, self.addr, router[0], _table_string(self.routingTable))
 				self.send(porta, packets)
 		if self.currentTime - self.sentTime > self.heartbeatTime:
 			for router in self.neighbors:
-				if router == self.addr: continue
-				porta = self.routingTable[router]['port']
-				packets = Packet(Packet.ROUTING, self.addr, router, _table_string(self.routingTable))
+				if router[0] == self.addr: continue
+				porta = self.routingTable[router[0]]['port']
+				packets = Packet(Packet.ROUTING, self.addr, router[0], _table_string(self.routingTable))
 				self.send(porta, packets)
 			self.sentTime = self.currentTime
 
