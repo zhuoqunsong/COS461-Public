@@ -10,6 +10,8 @@ from router import Router
 from packet import Packet
 from json import dumps, loads
 
+INFINITY = 16
+
 def _table_string(routingTable):
 	"""Turn routing table into string format."""
 	result = []
@@ -75,8 +77,10 @@ class DVrouter(Router):
 		"""TODO: handle removed link"""
 		address = None # address corresponds to address of removed port
 		for add in self.neighbors:
-			if self.routingTable[add]['port'] == port:
+			if self.routingTable[add]['ID'] == port:
 				address = add
+		self.routingTable[add]['cost'] = INFINITY
+
 
 	def handleTime(self, timeMillisecs):
 		"""TODO: handle current time"""
