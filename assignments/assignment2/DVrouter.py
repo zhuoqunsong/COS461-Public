@@ -80,6 +80,7 @@ class DVrouter(Router):
 			if self.routingTable[add]['ID'] == port:
 				address = add
 		self.routingTable[add]['cost'] = INFINITY
+		self.neighbors.remove(add)
 
 
 	def handleTime(self, timeMillisecs):
