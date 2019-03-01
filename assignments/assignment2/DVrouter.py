@@ -39,6 +39,10 @@ class DVrouter(Router):
 		"""TODO: process incoming packet"""
 		if packet.isRouting(): 
 			src = packet.srcAddr # source
+			srcCost = INFINITY
+			for x in self.neighbors:
+				if x[0] == src:
+					srcCost = x[1]
 			dst = packet.dstAddr # destination
 			content = packet.content # content
 			# self.packeta.append(content) # for debugging
@@ -46,31 +50,31 @@ class DVrouter(Router):
 			for entry in table:
 				router = entry.split('%')[0]
 				if router in self.routingTable: # Update our routing table if less cost
-					dist = self.routingTable[src]['cost']
-					cost = int(entry.split('%')[1].split('&')[0]) + dist
-					port = self.routingTable[src]['port']
+					cost = int(entry.split('%')[1].split('&')[0]) + srcCost
 					if cost > self.routingTable[router]['cost'] and self.routingTable[router]['port'] == port:
-						self.routingTable[router]['cost'] = INFINITY
+						self.routingTable[router]['cost'] = cost
+						# print (self.addr, router, port, cost)
 					if cost < self.routingTable[router]['cost']:
 						self.routingTable[router]['port'] = port
 						self.routingTable[router]['cost'] = cost
+						# print (self.addr, router, port, cost)
 				else: # Add to our routing table
 					# DO ADDRESS STUFF TOO
-					dist = self.routingTable[src]['cost']
-					cost = int(entry.split('%')[1].split('&')[0]) + dist
+					cost = int(entry.split('%')[1].split('&')[0]) + srcCost
 					port = self.routingTable[src]['port']
 					self.routingTable[router] = {'port': port, 'cost': cost}
+					# print (self.addr, router, port, cost)
 		else: # packet.isTraceroute(): send packet to destination
 			dst = packet.dstAddr
 			if dst in self.routingTable:
 				port = self.routingTable[dst]['port']
-				self.send(port, packet)
+				self.send(port, packet) 
 
 
 	def handleNewLink(self, port, endpoint, cost):
 		"""TODO: handle new link"""
 		self.routingTable[endpoint] = {'port': port, 'cost': cost, 'ID': port} # add link to routing table
-		self.neighbors.append((endpoint,cost,port)) # add new endpoint to neighbors
+		self.neighbors.add((endpoint,cost,port)) # add new endpoint to neighbors
 		for router in self.neighbors: # send new routing table to all neighbors
 			if router[0] == self.addr: continue
 			porta = self.routingTable[router[0]]['port']
@@ -82,7 +86,7 @@ class DVrouter(Router):
 		address = None # address corresponds to address of removed port
 		for add in self.neighbors:
 			if self.routingTable[add[0]]['ID'] == port:
-				address = add[0]
+				address = add
 		for router in self.routingTable:
 			if self.routingTable[router]['port'] == port:
 				self.routingTable[router]['cost'] = INFINITY
@@ -95,13 +99,13 @@ class DVrouter(Router):
 		if self.sentTime == 0: # periodically send routing table to all neighbors
 			for router in self.neighbors:
 				if router[0] == self.addr: continue
-				porta = self.routingTable[router[0]]['port']
+				porta = self.routingTable[router[0]]['ID']
 				packets = Packet(Packet.ROUTING, self.addr, router[0], _table_string(self.routingTable))
 				self.send(porta, packets)
 		if self.currentTime - self.sentTime > self.heartbeatTime:
 			for router in self.neighbors:
 				if router[0] == self.addr: continue
-				porta = self.routingTable[router[0]]['port']
+				porta = self.routingTable[router[0]]['ID']
 				packets = Packet(Packet.ROUTING, self.addr, router[0], _table_string(self.routingTable))
 				self.send(porta, packets)
 			self.sentTime = self.currentTime
