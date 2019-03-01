@@ -18,6 +18,7 @@ class LSrouter(Router):
         Router.__init__(self, addr)  # initialize superclass - don't remove
         self.heartbeatTime = heartbeatTime # heartbeat time
         self.currentTime = 0 # current time
+        self.sentTime = 0
         self.routingTable = dict() # table of routers with their LSPs
         self.neighbors = [] # list of neighbors [(address, cost, port)]
         self.confirmed = dict() # final routing table, for dijkstra
@@ -54,7 +55,7 @@ class LSrouter(Router):
     def create_lsp(self):
         list_neigh = []
         for neighbor in self.neighbors:
-            add, cost, port = neighbor
+            add, cost, port, _ = neighbor
             list_neigh.append('{}%{}%{}'.format(add, cost, port))
         neigh = '@'.join(list_neigh)
         neigh = '{}@{}@{}'.format(self.addr, neigh, self.currentTime)
@@ -63,7 +64,7 @@ class LSrouter(Router):
 
     def flood(self, lsp):
         for neighbor in self.neighbors:
-            add, cost, port = neighbor
+            add, cost, port, _ = neighbor
             source = lsp.srcAddr
             if add != source:
                 self.send(port, lsp)
@@ -88,10 +89,10 @@ class LSrouter(Router):
             else:
                 self.routingTable[address] = {'neighs' : neighs, 'time': time}
             for nexts in self.neighbors:
-                if nexts[0] != port:
-                    if self.currentTime - int(time) < 16000: # flood packets until time limit reached
-                    #if address not in self.confirmed:
-                        self.send(nexts[~0], packet)
+                if nexts[0] != port and nexts[3] != packet.content:
+                    print packet.content
+                    self.send(nexts[-2], packet)
+                    nexts = (nexts[0], nexts[1], nexts[2], packet.content)
         else: # if packet.isTraceroute(): send to destination
             dst = packet.dstAddr
             if dst in self.confirmed: # if destination in our table, then send
@@ -102,22 +103,27 @@ class LSrouter(Router):
     def handleNewLink(self, port, endpoint, cost):
         """TODO: handle new link"""
         #self.routingTable[endpoint] = {'port': port, 'cost': cost}
-        self.neighbors.append((endpoint,cost,port))
+        self.neighbors.append((endpoint,cost,port, ""))
         self.flood(self.create_lsp())
 
 
     def handleRemoveLink(self, port):
         """TODO: handle removed link"""
+        address = None # address corresponds to address of removed port
+        for add in self.neighbors:
+            if self.routingTable[add[0]]['ID'] == port:
+                address = add
+        self.neighbors.remove(address)
+        self.flood(self.create_lsp())
         pass
 
 
     def handleTime(self, timeMillisecs):
         """TODO: handle current time"""
-        self.currentTime = timeMillisecs
-        if self.currentTime % 10 == 0: # run dijkstra
+        self.currentTime = timeMillisecs # handle current time
+        if self.sentTime == 0 or self.currentTime - self.sentTime > self.heartbeatTime: # periodically send routing table to all neighbors
             self.dijkstra()
-            # self.flood(self.create_lsp())
-
+            self.sentTime = self.currentTime
 
     def debugString(self):
         """TODO: generate a string for debugging in network visualizer"""
