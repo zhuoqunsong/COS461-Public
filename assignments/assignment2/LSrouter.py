@@ -85,6 +85,10 @@ class LSrouter(Router):
                 neighs[ad] = {'cost': cost, 'port': port}
             if address in self.routingTable:
                 if time > self.routingTable[address]['time']:
+                    old_neighs = self.routingTable[address]['neighs']
+                    for old_neigh in old_neighs:
+                        if old_neigh not in neighs:
+                            neighs[old_neigh] = old_neighs[old_neigh]
                     self.routingTable[address] = {'neighs' : neighs, 'time': time}
             else:
                 self.routingTable[address] = {'neighs' : neighs, 'time': time}
