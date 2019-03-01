@@ -85,18 +85,18 @@ class LSrouter(Router):
                 neighs[ad] = {'cost': cost, 'port': port}
             if address in self.routingTable:
                 if time > self.routingTable[address]['time']:
-                    old_neighs = self.routingTable[address]['neighs']
-                    for old_neigh in old_neighs:
-                        if old_neigh not in neighs:
-                            neighs[old_neigh] = old_neighs[old_neigh]
+                    # old_neighs = self.routingTable[address]['neighs']
+                    # for old_neigh in old_neighs:
+                    #     if old_neigh not in neighs:
+                    #        neighs[old_neigh] = old_neighs[old_neigh]
                     self.routingTable[address] = {'neighs' : neighs, 'time': time}
             else:
                 self.routingTable[address] = {'neighs' : neighs, 'time': time}
             for nexts in self.neighbors:
-                if nexts[0] != port and nexts[3] != packet.content:
-                    print packet.content
+                if nexts[0] != port and packet.content not in nexts[3]:
+                    # print (nexts[3], packet.content)
                     self.send(nexts[-2], packet)
-                    nexts = (nexts[0], nexts[1], nexts[2], packet.content)
+                    nexts[3].append(packet.content)
         else: # if packet.isTraceroute(): send to destination
             dst = packet.dstAddr
             if dst in self.confirmed: # if destination in our table, then send
@@ -107,7 +107,7 @@ class LSrouter(Router):
     def handleNewLink(self, port, endpoint, cost):
         """TODO: handle new link"""
         #self.routingTable[endpoint] = {'port': port, 'cost': cost}
-        self.neighbors.append((endpoint,cost,port, ""))
+        self.neighbors.append([endpoint,cost,port, []])
         self.flood(self.create_lsp())
 
 
@@ -115,7 +115,7 @@ class LSrouter(Router):
         """TODO: handle removed link"""
         address = None # address corresponds to address of removed port
         for add in self.neighbors:
-            if self.routingTable[add[0]]['ID'] == port:
+            if add[2] == port:
                 address = add
         self.neighbors.remove(address)
         self.flood(self.create_lsp())
