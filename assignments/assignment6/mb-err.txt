@@ -1,0 +1,17 @@
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 810, in __bootstrap_inner
+    self.run()
+  File "/usr/lib/python2.7/threading.py", line 763, in run
+    self.__target(*self.__args, **self.__kwargs)
+  File "mb.py", line 105, in sniff
+    lfilter = lambda x : self.incoming(x, in_intf, out_intf))
+  File "/usr/local/lib/python2.7/dist-packages/scapy/sendrecv.py", line 886, in sniff
+    r = prn(p)
+  File "mb.py", line 104, in <lambda>
+    scasniff(iface=in_intf, prn = lambda x : self.handle_packet(in_intf, out_intf, x),
+  File "mb.py", line 94, in handle_packet
+    if random.random() < 0.9: return
+AttributeError: 'builtin_function_or_method' object has no attribute 'random'
+
+Exception IOError: (19, 'No such device') in <bound method L2ListenSocket.__del__ of <scapy.arch.linux.L2ListenSocket object at 0x7fb54e6b0a10>> ignored
