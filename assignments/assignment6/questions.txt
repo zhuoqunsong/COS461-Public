@@ -1,8 +1,8 @@
 ###########################################
 
 COS 461: Assignment 6
-Names: 
-NetIds:
+Names: Yang Song, Zhuo Qun Song
+NetIds: yangsong, zsong
 
 ###########################################
 

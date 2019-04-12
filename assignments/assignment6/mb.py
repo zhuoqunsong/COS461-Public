@@ -67,10 +67,8 @@ class PacketHandler:
 
         # check whether pkt is an IP packet
         if IP in pkt:
-
             # get source IP addresses
             src_ip = pkt[IP].src
-
             # get destionation IP addresses
             dst_ip = pkt[IP].dst
 
@@ -85,17 +83,21 @@ class PacketHandler:
             dns_id = pkt[DNS].id
 
             # DNS packet going out interface mb-eth0 (toward h1 & h4)
-            if out_intf == 'mb-eth0':
-                if is_response:
-                    # Check whether there has been a request with same ID number from destination IP
-                    if dns_id not in self.requests[dst_ip]:
-                        self.responses[dst_ip] += 1
-                        if self.responses[dst_ip] > 200:
-                            if random.random() < 0.9: return
-                if is_request:
-                    self.requests[dst_ip].add(dns_id)
+            if out_intf == 'mb-eth0' and is_response:
+                # Check whether there has been a request with same ID number from destination IP
+                if dns_id not in self.requests[dst_ip]:
+                    self.responses[dst_ip] += 1
+                    #print('r{}'.format(self.responses))
+                    if self.responses[dst_ip] > 200:
+                        r = random()
+                        #print(r)
+                        if r < 0.9: 
+                            return
+                
+            if out_intf == 'mb-eth1' and is_request:
+                #print(src_ip, dns_id)
+                self.requests[src_ip].add(dns_id)
 
-            
 	    # Forwarding the traffic to the target network (DO NOT CHANGE)
         sendp(pkt, iface=out_intf, verbose = 0)
 

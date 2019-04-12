@@ -1,17 +1,29 @@
+Exception IOError: (19, 'No such device') in <bound method L2ListenSocket.__del__ of <scapy.arch.linux.L2ListenSocket object at 0x7fc5409a9a10>> ignored
 Exception in thread Thread-2:
 Traceback (most recent call last):
   File "/usr/lib/python2.7/threading.py", line 810, in __bootstrap_inner
     self.run()
   File "/usr/lib/python2.7/threading.py", line 763, in run
     self.__target(*self.__args, **self.__kwargs)
-  File "mb.py", line 105, in sniff
+  File "mb.py", line 107, in sniff
     lfilter = lambda x : self.incoming(x, in_intf, out_intf))
   File "/usr/local/lib/python2.7/dist-packages/scapy/sendrecv.py", line 886, in sniff
     r = prn(p)
-  File "mb.py", line 104, in <lambda>
+  File "mb.py", line 106, in <lambda>
     scasniff(iface=in_intf, prn = lambda x : self.handle_packet(in_intf, out_intf, x),
-  File "mb.py", line 94, in handle_packet
-    if random.random() < 0.9: return
-AttributeError: 'builtin_function_or_method' object has no attribute 'random'
+  File "mb.py", line 102, in handle_packet
+    sendp(pkt, iface=out_intf, verbose = 0)
+  File "/usr/local/lib/python2.7/dist-packages/scapy/sendrecv.py", line 326, in sendp
+    socket = conf.L2socket(iface=iface, *args, **kargs)
+  File "/usr/local/lib/python2.7/dist-packages/scapy/arch/linux.py", line 456, in __init__
+    set_promisc(self.ins, self.iface)
+  File "/usr/local/lib/python2.7/dist-packages/scapy/arch/linux.py", line 145, in set_promisc
+    mreq = struct.pack("IHH8s", get_if_index(iff), PACKET_MR_PROMISC, 0, b"")
+  File "/usr/local/lib/python2.7/dist-packages/scapy/arch/linux.py", line 360, in get_if_index
+    return int(struct.unpack("I", get_if(iff, SIOCGIFINDEX)[16:20])[0])
+  File "/usr/local/lib/python2.7/dist-packages/scapy/arch/common.py", line 50, in get_if
+    ifreq = ioctl(sck, cmd, struct.pack("16s16x", iff.encode("utf8")))
+IOError: [Errno 19] No such device
 
-Exception IOError: (19, 'No such device') in <bound method L2ListenSocket.__del__ of <scapy.arch.linux.L2ListenSocket object at 0x7fb54e6b0a10>> ignored
+Exception IOError: (19, 'No such device') in <bound method L2Socket.__del__ of <scapy.arch.linux.L2Socket object at 0x7fc53aa13d10>> ignored
+Exception IOError: (19, 'No such device') in <bound method L2ListenSocket.__del__ of <scapy.arch.linux.L2ListenSocket object at 0x7fc5409a97d0>> ignored
