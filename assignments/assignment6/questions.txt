@@ -11,7 +11,9 @@ Question 1) Approximately how long into the simulation (seconds)
             is the DNS reflection attack detected? 
             How can you tell this from the DNS response rate plot?
 
-Answer 1) TODO
+Answer 1) The DNS reflection attack was detected at 105 seconds. We could tell because
+          the rate of DNS responses for h1 decreased at this time, meaning that mb
+          filtered out some of the responses.
 
 
 ##########################################
@@ -19,7 +21,7 @@ Answer 1) TODO
 Question 2) With what probability does your implementation drop 
             DNS response packets to perform rate limiting?
 
-Answer 2) TODO
+Answer 2) We chose a probability of 0.9.
 
 
 ##########################################
@@ -29,7 +31,19 @@ Question 3) Why did you choose this probability?
             the DNS response rate plot? (Re-run the experiment
             with different probability values if you are not sure). 
 
-Answer 3) TODO
+Answer 3) We chose a probability of 0.9 because it was close to 1. We did not see many
+          reasons for sending DNS requests with spoofed source IP addresses, but
+          perhaps it is better to leave open the possibility of being able to have such
+          a request go through. On the other hand, choosing a high probability for
+          dropping packets means that fewer DNS responses go to the attacked device,
+          and this decreases the likelihood of that device being overloaded with
+          responses.
+
+          In the setup, there was 1 DNS request per 5 seconds from h1 and h4 and 10
+          DNS requests from the attacker per 5 seconds. Thus, if the probability that
+          we drop the packet is p, then the amount of DNS responses that h1 gets is
+          1 + 10(1-p) per 5 seconds. In particular, when p = 0.9, h1 only gets double
+          the traffic that it should have gotten.
 
 
 ##########################################
@@ -39,8 +53,33 @@ Question 4) What components of the detection/mitigation technique used in this a
             may not be optimal for real-world deployment? 
             Choose one and explain how it could be improved.
 
-Answer 4) TODO
+Answer 4)   In the real world, there is more than 1 DNS resolver, and the amount of state
+            that the middlebox has to store is proportional to the product of the number
+            of DNS resolvers and the number of users. Additionally, we would ideally
+            like to block all malicious senders, because a potential malicious sender
+            could continue to send DNS requests with source IP addresses set to
+            different devices to continue generating malicious traffic, even if it would
+            then be distributed across different devices. In the real world, routing
+            algorithms could cause a DNS request packet to take very many different paths
+            and it would be difficult to construct a middlebox for each of them with
+            the sufficient computational power and memory. Lastly, the middleboxes
+            would ideally talk to each other in order to jointly stop attacks to a 
+            given victim, but sharing the entire state of the middlebox to other
+            middleboxes would be expensive. Additionally, it is needed to place
+            the middlebox between the attacker and the victim, because otherwise the
+            attacker's traffic looks just like the victim's traffic to the middlebox.
+            Thus, when there are a large number of attackers (with possibly unknown
+            locations), it will be hard to place the sufficient number of middleboxes.
 
+            We will also try to improve the current implementation that reads every packet.
+            The main disadvantage of reading every packet is that attackers could just
+            send too many packets to the middlebox too. One thing we can do is to have
+            the middlebox sample some packets of those that go through it to the
+            victims in order to make a decision about whether to drop future packets.
+            This would probably make it take longer to detect attacks (with a sample
+            rate of p, we would need 1/p^2 more packets to be sent before detection),
+            but it would decrease the computational power needed by the middlebox.
+            The memory requirement remains.
 
 ##########################################
 
@@ -62,7 +101,19 @@ Question 5) DNS reflection attacks are of real concern in the global Internet,
             This question is intentionally open-ended and will be graded leniently. 
             Try to be concise yet thorough. 
 
-Answer 5) TODO
+Answer 5)   DNS reflection attacks are possible because DNS is necessary for people
+            to access the internet when the map from domain names to IP addresses
+            and vice versa is large and must be stored in a distributed manner.
+            However, DNS is designed so that the user queries different DNS servers
+            sequentially, using the result from a different DNS server. Thus,
+            unsolicited messages that look like DNS responses and look like
+            normal activity can be used to attack a user. One way to fix this
+            is perhaps to have the DNS request be done solely by the
+            DNS server, rather than by the user; that is, if the DNS server
+            also has some capability to contact other DNS servers. Then,
+            we just need a sufficiently high level of availability
+            for the DNS servers and a distributed solution that
+            scales across many DNS servers.
             
 
 
