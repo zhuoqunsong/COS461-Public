@@ -1,7 +1,12 @@
 ####################################################
 # mb.py
+<<<<<<< HEAD
 # Names: Yang Song, Zhuo Qun Song
 # NetIds: yangsong, zsong
+=======
+# Names:
+# NetIds:
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 #####################################################
 
 import sys
@@ -23,8 +28,11 @@ class PacketHandler:
         self.ip_map = ip_map
         # TODO: Create and initialize additional instance variables
         #       for detection and mitigation
+<<<<<<< HEAD
         self.requests = defaultdict(set)
         self.responses = defaultdict(int)
+=======
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
         
 
@@ -65,6 +73,7 @@ class PacketHandler:
 	    # TODO: process the packet to perform DNS reflection attack
             #       detection and mitigation
 
+<<<<<<< HEAD
         # check whether pkt is an IP packet
         if IP in pkt:
             # get source IP addresses
@@ -98,6 +107,10 @@ class PacketHandler:
                 #print(src_ip, dns_id)
                 self.requests[src_ip].add(dns_id)
 
+=======
+
+            
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 	    # Forwarding the traffic to the target network (DO NOT CHANGE)
         sendp(pkt, iface=out_intf, verbose = 0)
 

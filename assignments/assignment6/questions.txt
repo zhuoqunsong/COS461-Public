@@ -1,8 +1,13 @@
 ###########################################
 
 COS 461: Assignment 6
+<<<<<<< HEAD
 Names: Yang Song, Zhuo Qun Song
 NetIds: yangsong, zsong
+=======
+Names: 
+NetIds:
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
 ###########################################
 
@@ -11,9 +16,13 @@ Question 1) Approximately how long into the simulation (seconds)
             is the DNS reflection attack detected? 
             How can you tell this from the DNS response rate plot?
 
+<<<<<<< HEAD
 Answer 1) The DNS reflection attack was detected at 105 seconds. We could tell because
           the rate of DNS responses for h1 decreased at this time, meaning that mb
           filtered out some of the responses.
+=======
+Answer 1) TODO
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
 
 ##########################################
@@ -21,7 +30,11 @@ Answer 1) The DNS reflection attack was detected at 105 seconds. We could tell b
 Question 2) With what probability does your implementation drop 
             DNS response packets to perform rate limiting?
 
+<<<<<<< HEAD
 Answer 2) We chose a probability of 0.9.
+=======
+Answer 2) TODO
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
 
 ##########################################
@@ -31,6 +44,7 @@ Question 3) Why did you choose this probability?
             the DNS response rate plot? (Re-run the experiment
             with different probability values if you are not sure). 
 
+<<<<<<< HEAD
 Answer 3) We chose a probability of 0.9 because it was close to 1. We did not see many
           reasons for sending DNS requests with spoofed source IP addresses, but
           perhaps it is better to leave open the possibility of being able to have such
@@ -44,6 +58,9 @@ Answer 3) We chose a probability of 0.9 because it was close to 1. We did not se
           we drop the packet is p, then the amount of DNS responses that h1 gets is
           1 + 10(1-p) per 5 seconds. In particular, when p = 0.9, h1 only gets double
           the traffic that it should have gotten.
+=======
+Answer 3) TODO
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
 
 ##########################################
@@ -53,6 +70,7 @@ Question 4) What components of the detection/mitigation technique used in this a
             may not be optimal for real-world deployment? 
             Choose one and explain how it could be improved.
 
+<<<<<<< HEAD
 Answer 4)   In the real world, there is more than 1 DNS resolver, and the amount of state
             that the middlebox has to store is proportional to the product of the number
             of DNS resolvers and the number of users. Additionally, we would ideally
@@ -80,6 +98,10 @@ Answer 4)   In the real world, there is more than 1 DNS resolver, and the amount
             rate of p, we would need 1/p^2 more packets to be sent before detection),
             but it would decrease the computational power needed by the middlebox.
             The memory requirement remains.
+=======
+Answer 4) TODO
+
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
 
 ##########################################
 
@@ -101,6 +123,7 @@ Question 5) DNS reflection attacks are of real concern in the global Internet,
             This question is intentionally open-ended and will be graded leniently. 
             Try to be concise yet thorough. 
 
+<<<<<<< HEAD
 Answer 5)   DNS reflection attacks are possible because DNS is necessary for people
             to access the internet when the map from domain names to IP addresses
             and vice versa is large and must be stored in a distributed manner.
@@ -114,6 +137,9 @@ Answer 5)   DNS reflection attacks are possible because DNS is necessary for peo
             we just need a sufficiently high level of availability
             for the DNS servers and a distributed solution that
             scales across many DNS servers.
+=======
+Answer 5) TODO
+>>>>>>> 40306cbb021f466e8f98c535c6e3e21aca8e100b
             
 
 
