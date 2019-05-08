@@ -2,7 +2,8 @@ package main
 
 import "os"
 import "fmt"
-import "strconv"
+// import "strconv"
+import "net"
 
 /*****************************************************************************
  * http_proxy.go                                                                 
@@ -16,6 +17,20 @@ import "strconv"
  // run with ./http_proxy PORT
 
 func main() {
-	port, _ := strconv.Atoi(os.Args[1]);
-	fmt.Println(port)
+	port := os.Args[1]
+
+	// TODO: handle error
+	ln, _ := net.Listen("tcp", ":" + port)
+	for {
+		// TODO: handle error
+		conn, _ := ln.Accept()
+		go handleConnection(conn)
+
+	}
+
+}
+
+func handleConnection(conn net.Conn) {
+	// TODO: handle connection
+	fmt.Println("connect")
 }
