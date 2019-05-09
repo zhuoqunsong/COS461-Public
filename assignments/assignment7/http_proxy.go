@@ -1,10 +1,3 @@
-package main
-
-import "os"
-import "fmt"
-// import "strconv"
-import "net"
-
 /*****************************************************************************
  * http_proxy.go                                                                 
  * Names: Rami Farran, Zhuo Qun Song
@@ -15,6 +8,14 @@ import "net"
 
  // compile with $ go build http_proxy.go
  // run with ./http_proxy PORT
+
+package main
+
+import "os"
+import "fmt"
+// import "strconv"
+import "net"
+import "io/ioutil"
 
 func main() {
 	port := os.Args[1]
@@ -31,6 +32,10 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
+	defer conn.Close()
+	fmt.Println("connected")
 	// TODO: handle connection
-	fmt.Println("connect")
+	in, _ := ioutil.ReadAll(conn)
+	inStr := string(in)
+	fmt.Println(inStr)
 }
