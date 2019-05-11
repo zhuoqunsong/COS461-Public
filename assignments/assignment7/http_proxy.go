@@ -13,9 +13,11 @@ package main
 
 import "os"
 import "fmt"
-// import "strconv"
+import "bufio"
 import "net"
-import "io/ioutil"
+import "net/http"
+// import "net/url"
+import "time"
 
 func main() {
 	port := os.Args[1]
@@ -33,9 +35,39 @@ func main() {
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
-	fmt.Println("connected")
 	// TODO: handle connection
-	in, _ := ioutil.ReadAll(conn)
-	inStr := string(in)
-	fmt.Println(inStr)
+	req, err := http.ReadRequest(bufio.NewReader(conn))
+	if err != nil {
+		// TODO: HANDLE ERROR
+	}
+	if req.Method != http.MethodGet {
+		// TODO: Handle non-GET
+	}
+	// Now assume that it is a well-formatted GET request.
+	// If request has URL in URL field; move it to relative
+	/*
+	if req.URL.String() != "/" {
+		req.Host = req.URL.String()
+		req.URL, _ = url.Parse("/")
+	}
+	*/
+
+	// Reset requestURI
+	req.RequestURI = ""
+	req.URL.Host = req.Host
+	req.URL.Scheme = "http"
+	fmt.Println(req)
+
+	// Send request onward to server
+	// 10 second timeout
+	dur, _ := time.ParseDuration("10s")
+	client := http.Client{nil, nil, nil, dur}
+	resp, err := client.Do(req)
+	fmt.Println(err)
+	// TODO: Handle Error
+	fmt.Println(resp)
+
+	fmt.Println(req)
+	resp.Write(conn)
+	// TODO: Handle Error
 }
