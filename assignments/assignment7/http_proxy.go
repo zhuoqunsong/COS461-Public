@@ -4,11 +4,6 @@
  * NetIds: rfarran, zsong
  *****************************************************************************/
 
- // TODO: implement an HTTP proxy
-
- // compile with $ go build http_proxy.go
- // run with ./http_proxy PORT
-
 package main
 
 import "os"

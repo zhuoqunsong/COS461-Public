@@ -1,13 +1,8 @@
 /*****************************************************************************
- * http_proxy.go                                                                 
+ * http_proxy_DNS.go                                                                 
  * Names: Rami Farran, Zhuo Qun Song
  * NetIds: rfarran, zsong
  *****************************************************************************/
-
- // TODO: implement an HTTP proxy
-
- // compile with $ go build http_proxy.go
- // run with ./http_proxy PORT
 
 package main
 
@@ -72,15 +67,50 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
-	// intercept response
-	doc, err := html.Parse(resp.Body)
-
+	resp2, _ := client.Do(req)
+	// copy for DNS caching
 
 
 	// fmt.Println(resp)
 	err = resp.Write(conn)
 	if err != nil {
 		fmt.Println("Error in writing to existing connection")
+		return
+	}
+
+	// intercept response
+	foundLinks := make([]string, 0)
+	doc, err := html.Parse(resp2.Body)
+	if err != nil {
+		fmt.Println("error in parsing html ")
+		fmt.Println(err)
+		return
+	}
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for _, a := range n.Attr {
+				if a.Key == "href" {
+					foundLinks = append(foundLinks, a.Val)
+					break
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+
+	// for each link in foundLinks, issue DNS queries
+	for _, link := range foundLinks {
+		go prefetchLink(link)
+	}
+}
+
+func prefetchLink(link string) {
+	_, err := net.LookupHost(link)
+	if err == nil {
 		return
 	}
 }
