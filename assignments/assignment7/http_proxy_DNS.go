@@ -73,14 +73,7 @@ func handleConnection(conn net.Conn) {
 	}
 
 	// intercept response
-	z := html.NewTokenizer(resp.Body)
-	for {
-		t := z.Next()
-		fmt.Println(t)
-		if t == html.ErrorToken {
-			break
-		}
-	}
+	doc, err := html.Parse(resp.Body)
 
 
 
