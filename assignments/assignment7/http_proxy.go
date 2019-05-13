@@ -16,58 +16,80 @@ import "fmt"
 import "bufio"
 import "net"
 import "net/http"
-// import "net/url"
 import "time"
 
 func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: ./http_proxy PORT")
+		return
+	}
 	port := os.Args[1]
 
 	// TODO: handle error
-	ln, _ := net.Listen("tcp", ":" + port)
-	for {
-		// TODO: handle error
-		conn, _ := ln.Accept()
-		go handleConnection(conn)
-
+	ln, err := net.Listen("tcp", ":" + port)
+	if err != nil {
+		fmt.Println("Unable to create server at port " + port)
+		return
 	}
-
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			fmt.Println("Error in establishing connection")
+		} else {
+			go handleConnection(conn)			
+		}
+	}
 }
 
 func handleConnection(conn net.Conn) {
-	defer conn.Close()
+	defer closeConnection(conn)
 	// TODO: handle connection
 	req, err := http.ReadRequest(bufio.NewReader(conn))
 	if err != nil {
-		// TODO: HANDLE ERROR
+		write500(conn)
+		return
 	}
 	if req.Method != http.MethodGet {
-		// TODO: Handle non-GET
+		write500(conn)
+		return
 	}
 	// Now assume that it is a well-formatted GET request.
-	// If request has URL in URL field; move it to relative
-	/*
-	if req.URL.String() != "/" {
-		req.Host = req.URL.String()
-		req.URL, _ = url.Parse("/")
-	}
-	*/
 
 	// Reset requestURI
 	req.RequestURI = ""
 	req.URL.Host = req.Host
 	req.URL.Scheme = "http"
-	fmt.Println(req)
+	// fmt.Println(req)
 
 	// Send request onward to server
 	// 10 second timeout
 	dur, _ := time.ParseDuration("10s")
 	client := http.Client{nil, nil, nil, dur}
 	resp, err := client.Do(req)
-	fmt.Println(err)
-	// TODO: Handle Error
-	fmt.Println(resp)
+	if err != nil {
+		write500(conn)
+		return
+	}
+	// fmt.Println(resp)
+	err = resp.Write(conn)
+	if err != nil {
+		fmt.Println("Error in writing to existing connection")
+		return
+	}
+}
 
-	fmt.Println(req)
-	resp.Write(conn)
-	// TODO: Handle Error
+func write500(conn net.Conn) {
+	_, err := conn.Write([]byte("HTTP/1.1 500 Internal Error\r\n"))
+	if err != nil {
+		fmt.Println("Error in writing to existing connection")
+		return
+	}
+}
+
+func closeConnection(conn net.Conn) {
+	err := conn.Close()
+	if err != nil {
+		fmt.Println("Error in closing connection")
+		return
+	}
 }
